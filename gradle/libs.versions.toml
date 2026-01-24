@@ -1,0 +1,14 @@
+[versions]
+guava = "33.5.0-jre"
+picocli = "4.7.7"
+odf = "0.13.0"
+ical4j = "4.2.3"
+lombok = "1.18.42"
+
+[libraries]
+guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
+picocli = { group = "info.picocli", name = "picocli", version.ref = "picocli" }
+picocli-codegen = { group = "info.picocli", name = "picocli-codegen", version.ref = "picocli" }
+ical4j = { group = "org.mnode.ical4j", name = "ical4j", version.ref = "ical4j" }
+odf = { group = "org.odftoolkit", name = "odfdom-java", version.ref = "odf" }
+lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
