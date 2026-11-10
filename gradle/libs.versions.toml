@@ -1,5 +1,5 @@
 [versions]
-guava = "33.5.0-jre"
+guava = "33.7.1-jre"
 picocli = "4.7.7"
 odf = "0.13.0"
 ical4j = "4.2.3"
