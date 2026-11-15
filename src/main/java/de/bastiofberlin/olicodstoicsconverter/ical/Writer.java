@@ -4,6 +4,7 @@ import de.bastiofberlin.olicodstoicsconverter.odf.model.Termin;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -16,8 +17,10 @@ import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.FluentCalendar;
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
+import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VTimeZone;
+import net.fortuna.ical4j.model.property.Action;
 import net.fortuna.ical4j.model.property.Comment;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.Uid;
@@ -30,6 +33,10 @@ public class Writer {
   private static final String TZ_BERLIN = "Europe/Berlin";
   private static final String TERMIN_PREFIX = "Öl: ";
   private static final ZoneId ZONE = ZoneId.of(TZ_BERLIN);
+  private static final LocalTime REMINDER_CUTOFF = LocalTime.NOON;
+  private static final LocalTime REMINDER_DAY_BEFORE_TIME = LocalTime.of(16, 0);
+  private static final Duration REMINDER_OFFSET = Duration.ofHours(2);
+  private static final Action ACTION_DISPLAY = new Action(Action.VALUE_DISPLAY);
   private static final VTimeZone V_TIME_ZONE =
       TimeZoneRegistryFactory.getInstance().createRegistry().getTimeZone(TZ_BERLIN).getVTimeZone();
   private static final DateTimeFormatter UID_TIME_FORMATTER =
@@ -57,12 +64,35 @@ public class Writer {
     final var start = getDateTime(termin.datum(), termin.start());
     final var ende = getDateTime(termin.datum(), termin.ende());
     final var eventName = getEventName(termin);
+    final var event = new VEvent(start, ende, eventName);
+    event.add(createReminder(start, eventName));
     final var meeting =
-        new VEvent(start, ende, eventName)
+        event
             .withProperty(V_TIME_ZONE.getTimeZoneId())
             .withProperty(createUid(termin))
             .withProperty(new Description(termin.thema()));
     calendar.withComponent((VEvent) meeting.getFluentTarget());
+  }
+
+  /**
+   * Events starting before noon get a reminder the day before at 16:00, all others 2 hours before
+   * the start. The offset is computed in Europe/Berlin time so it stays correct across DST changes.
+   */
+  static Duration reminderOffset(final ZonedDateTime start) {
+    if (start.toLocalTime().isBefore(REMINDER_CUTOFF)) {
+      final var reminder = start.minusDays(1).with(REMINDER_DAY_BEFORE_TIME);
+      return Duration.between(reminder, start);
+    }
+    return REMINDER_OFFSET;
+  }
+
+  private static @NonNull VAlarm createReminder(
+      final ZonedDateTime start, final String eventName) {
+    return (VAlarm)
+        new VAlarm(reminderOffset(start).negated())
+            .withProperty(ACTION_DISPLAY)
+            .withProperty(new Description(eventName))
+            .getFluentTarget();
   }
 
   private static @NonNull Uid createUid(final Termin termin) {
