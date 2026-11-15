@@ -36,4 +36,5 @@ Adding a new `Art` requires updating both the enum (abbreviation + `doImport`) a
 
 - Lombok (`@UtilityClass`, `@Builder`, `@Log`, etc.) is used throughout; picocli codegen runs as an annotation processor.
 - JSpecify `@NonNull` annotations on models.
+- CI (`.github/workflows/gradle.yml`) pins actions by commit SHA with a version comment; Dependabot (`.github/dependabot.yml`) keeps actions and Gradle dependencies updated.
 - Dependency versions live in `gradle/libs.versions.toml` (version catalog).
