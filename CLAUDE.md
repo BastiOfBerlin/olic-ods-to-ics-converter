@@ -14,11 +14,14 @@ Requires Java 25 (toolchain resolved via foojay; `options.release = 25`).
 ./gradlew build                      # compile + test (what CI runs)
 ./gradlew test                       # JUnit 5 tests
 ./gradlew test --tests 'FullyQualifiedClass.method'   # single test
-./gradlew jar                        # builds build/libs/olic-ods-to-ics-converter-1.0-SNAPSHOT.jar
-java -jar <jar> input.ods output.ics
+./gradlew shadowJar                  # fat jar: build/libs/olic-ods-to-ics-converter-1.0-SNAPSHOT-all.jar (also part of `build`)
+java -jar build/libs/*-all.jar input.ods output.ics
+./gradlew installShadowDist          # launchers: build/install/olic-ods-to-ics-shadow/bin/olic-ods-to-ics[.bat]
+./gradlew shadowDistZip              # distributable zip of the launchers + fat jar
+./gradlew run --args="input.ods output.ics"
 ```
 
-Note: the jar is not a fat jar — the `Class-Path` manifest line is commented out in `build.gradle.kts`, so running the plain jar requires dependencies on the classpath.
+Note: the plain `jar` task output (no `-all`) is thin and not runnable on its own. The Shadow plugin (`gradle/libs.versions.toml`) builds the fat jar; `mergeServiceFiles()` + `DuplicatesStrategy.INCLUDE` are required so odfdom/xerces and ical4j `META-INF/services` registrations survive.
 
 Tests (JUnit 5 + AssertJ) live in `src/test/java`, mirroring the main packages. `src/test/resources/Dienstplan_2026.ods` is a real sample roster; `src/test/resources/odf/*.ods` are small hand-made fixtures per scenario (LibreOffice-like structure, including a `table:table-column` declaration, which odfdom needs). They are binary; to regenerate them, build `content.xml` + `META-INF/manifest.xml` + an uncompressed `mimetype` entry (first in the zip) per fixture.
 

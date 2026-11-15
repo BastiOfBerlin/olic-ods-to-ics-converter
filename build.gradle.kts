@@ -1,5 +1,12 @@
 plugins {
     id("java")
+    application
+    alias(libs.plugins.shadow)
+}
+
+application {
+    mainClass = "de.bastiofberlin.olicodstoicsconverter.Application"
+    applicationName = "olic-ods-to-ics"
 }
 
 group = "de.bastiofberlin"
@@ -37,12 +44,20 @@ dependencies {
     testRuntimeOnly(libs.junit.platform.launcher)
 }
 
-tasks.withType<Jar> {
+tasks.withType<Jar>().configureEach {
     manifest {
-        attributes["Main-Class"] = "de.bastiofberlin.olicodstoicsconverter.Application"
+        attributes["Main-Class"] = application.mainClass
         attributes["Implementation-Version"] = project.version
-        //attributes["Class-Path"] = configurations.runtimeClasspath.files.collect { it.getName() }.join(' ')
     }
+}
+
+tasks.shadowJar {
+    // odfdom (xerces) and ical4j register implementations via META-INF/services
+    mergeServiceFiles()
+    // INCLUDE is required so all copies of the service files reach the merger
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    // Duplicate license/notice files from the dependencies are not needed in the fat jar
+    exclude("META-INF/LICENSE*", "META-INF/NOTICE*", "META-INF/DEPENDENCIES", "META-INF/versions/9/OSGI-INF/MANIFEST.MF")
 }
 
 tasks.test {

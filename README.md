@@ -5,11 +5,24 @@ Run in terminal:
 
 ## Usage
 
+Build the self-contained jar and run it (requires Java 25):
+
 ```shell
-java -jar olic-ods-to-ics-converter-1.0-SNAPSHOT.jar input.ods output.ics
+./gradlew shadowJar
+java -jar build/libs/olic-ods-to-ics-converter-1.0-SNAPSHOT-all.jar input.ods output.ics
 ```
 
-or use the `--help` commandline switch for further details.
+Or install launcher scripts to run it like a native command:
+
+```shell
+./gradlew installShadowDist
+build/install/olic-ods-to-ics-shadow/bin/olic-ods-to-ics input.ods output.ics   # .bat on Windows
+```
+
+Add `build/install/olic-ods-to-ics-shadow/bin` to your `PATH` to call `olic-ods-to-ics` from anywhere.
+`./gradlew shadowDistZip` produces a zip of the same for distribution.
+
+Use the `--help` commandline switch for further details.
 
 ## Development
 
