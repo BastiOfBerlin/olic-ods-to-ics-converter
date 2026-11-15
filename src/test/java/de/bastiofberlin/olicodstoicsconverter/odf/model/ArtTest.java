@@ -26,9 +26,9 @@ class ArtTest {
   }
 
   @Test
-  void onlyZbvAndBereichsausbildungAreNotImported() {
+  void onlyZbvBereichsausbildungAndSonstigesAreNotImported() {
     assertThat(Arrays.stream(Art.values()).filter(a -> !a.isDoImport()))
-        .containsExactlyInAnyOrder(Art.ZBV, Art.BEREICHSAUSBILDUNG);
+        .containsExactlyInAnyOrder(Art.ZBV, Art.BEREICHSAUSBILDUNG, Art.SONSTIGES);
   }
 
   @Test

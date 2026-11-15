@@ -13,6 +13,7 @@ public enum Art {
   UEBUNG("Üb", true),
   BEREICHSAUSBILDUNG("BerAusb", false),
   OFFENER_DIENST("OD", true),
+  SONSTIGES("Sonstiges", false),
   ;
 
   @Getter private final String value;

@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -164,7 +165,11 @@ class SheetParserTest {
                 LocalTime.of(19, 0),
                 LocalTime.of(21, 30)));
     assertThat(termine.getLast().datum()).isEqualTo(LocalDate.of(2026, 12, 15));
-    assertThat(termine).extracting(Termin::art).contains(Art.values());
+    // SONSTIGES only occurs in later rosters (2027), not in this 2026 sample.
+    assertThat(termine)
+        .extracting(Termin::art)
+        .contains(
+            Arrays.stream(Art.values()).filter(a -> a != Art.SONSTIGES).toArray(Art[]::new));
     assertThat(termine)
         .extracting(Termin::datum)
         .isSorted()
