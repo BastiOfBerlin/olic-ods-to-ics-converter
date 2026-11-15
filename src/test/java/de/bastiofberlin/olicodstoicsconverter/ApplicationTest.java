@@ -20,7 +20,7 @@ class ApplicationTest {
 
   @BeforeEach
   void setUp() {
-    cli = new CommandLine(new Application());
+    cli = Application.createCommandLine();
     cli.setOut(new PrintWriter(out));
     cli.setErr(new PrintWriter(err));
   }
@@ -56,7 +56,35 @@ class ApplicationTest {
     final int exitCode =
         cli.execute(TestFiles.resource("/odf/unknown_art.ods").toString(), output.toString());
 
-    assertThat(exitCode).isNotZero();
+    assertThat(exitCode).isEqualTo(CommandLine.ExitCode.SOFTWARE);
+    assertThat(err.toString()).contains("Fehler");
     assertThat(output).doesNotExist();
+  }
+
+  @Test
+  void missingInputFileIsAUsageError() {
+    final int exitCode =
+        cli.execute(tempDir.resolve("nope.ods").toString(), tempDir.resolve("o.ics").toString());
+
+    assertThat(exitCode).isEqualTo(CommandLine.ExitCode.USAGE);
+    assertThat(err.toString()).contains("nicht gefunden");
+  }
+
+  @Test
+  void defaultsOutputNextToInput() throws Exception {
+    final var input = tempDir.resolve("plan.ods");
+    Files.copy(TestFiles.resource("/odf/basic.ods"), input);
+
+    final int exitCode = cli.execute(input.toString());
+
+    assertThat(exitCode).isZero();
+    assertThat(tempDir.resolve("plan.ics")).exists();
+    assertThat(out.toString()).contains("Termine nach");
+  }
+
+  @Test
+  void versionIsPrinted() {
+    assertThat(cli.execute("--version")).isZero();
+    assertThat(out.toString()).contains("olic ods-to-ics-converter");
   }
 }

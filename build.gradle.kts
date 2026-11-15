@@ -40,6 +40,7 @@ dependencies {
 tasks.withType<Jar> {
     manifest {
         attributes["Main-Class"] = "de.bastiofberlin.olicodstoicsconverter.Application"
+        attributes["Implementation-Version"] = project.version
         //attributes["Class-Path"] = configurations.runtimeClasspath.files.collect { it.getName() }.join(' ')
     }
 }

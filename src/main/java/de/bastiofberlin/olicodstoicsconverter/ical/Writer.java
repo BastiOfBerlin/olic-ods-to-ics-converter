@@ -35,7 +35,7 @@ public class Writer {
   private static final DateTimeFormatter UID_TIME_FORMATTER =
       DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm");
 
-  public void writeTermineToFile(final Path outputPath, final Collection<Termin> termine)
+  public int writeTermineToFile(final Path outputPath, final Collection<Termin> termine)
       throws IOException {
     final var calendar = createCalendar();
 
@@ -50,6 +50,7 @@ public class Writer {
 
     logEventCount(count);
     writeCalendarToFile(outputPath, calendar);
+    return count;
   }
 
   private static void addTerminToCalendar(final Termin termin, final FluentCalendar calendar) {
