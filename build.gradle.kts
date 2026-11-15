@@ -24,6 +24,10 @@ java {
 
 tasks.withType<JavaCompile>().configureEach {
     options.release = 25
+}
+
+// Only the main source set runs the picocli-codegen annotation processor
+tasks.compileJava {
     options.compilerArgs.add("-Aproject=${project.group}/${project.name}")
 }
 
