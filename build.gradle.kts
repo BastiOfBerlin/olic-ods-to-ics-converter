@@ -31,18 +31,11 @@ dependencies {
 
     testCompileOnly(libs.lombok)
     testAnnotationProcessor(libs.lombok)
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.assertj.core)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
-
-// Source - https://stackoverflow.com/a
-// Posted by Stanislav, modified by community. See post 'Timeline' for change history
-// Retrieved 2025-12-18, License - CC BY-SA 4.0
-
-// Source - https://stackoverflow.com/a
-// Posted by Denis Zavedeev
-// Retrieved 2025-12-18, License - CC BY-SA 4.0
 
 tasks.withType<Jar> {
     manifest {

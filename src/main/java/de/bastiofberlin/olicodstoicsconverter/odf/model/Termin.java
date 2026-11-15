@@ -11,4 +11,12 @@ public record Termin(
     @NonNull Art art,
     @NonNull String thema,
     @NonNull LocalTime start,
-    @NonNull LocalTime ende) {}
+    @NonNull LocalTime ende) {
+
+  public Termin {
+    if (ende.isBefore(start)) {
+      throw new IllegalArgumentException(
+          "Ende (%s) liegt vor Start (%s) am %s.".formatted(ende, start, datum));
+    }
+  }
+}

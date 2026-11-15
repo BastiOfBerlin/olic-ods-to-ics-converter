@@ -34,6 +34,7 @@ public class SheetParser {
       final var table = doc.getTableList(false).getFirst();
       Map<ColumnType, Integer> columnIndices = null;
       int emptyRows = 0;
+      boolean dataSeen = false;
       for (int rowIdx = 0; ; rowIdx++) {
         if (rowIdx % 10 == 0) {
           final int finalRowIdx = rowIdx;
@@ -45,6 +46,10 @@ public class SheetParser {
         }
         final var firstCellValue = row.getCellByIndex(0).getStringValue();
         if (null == firstCellValue || firstCellValue.isEmpty()) {
+          if (dataSeen) {
+            // The first blank row after the roster ends it (what follows is e.g. a legend).
+            break;
+          }
           emptyRows++;
           continue;
         }
@@ -53,6 +58,7 @@ public class SheetParser {
           continue;
         }
         Objects.requireNonNull(columnIndices, "Could not determine column indices.");
+        dataSeen = true;
         try {
           if ("".equals(row.getCellByIndex(columnIndices.get(ColumnType.ART)).getStringValue())) {
             continue;
@@ -88,9 +94,10 @@ public class SheetParser {
 
   private Map<ColumnType, Integer> getColumnIndices(final OdfTableRow row) {
     final var ret = new EnumMap<ColumnType, Integer>(ColumnType.class);
-    for (int cellIdx = 0; ; cellIdx++) {
+    final int cellCount = row.getCellCount();
+    for (int cellIdx = 0; cellIdx < cellCount; cellIdx++) {
       final var cell = row.getCellByIndex(cellIdx);
-      if (cell.getOdfElement().getTableNumberColumnsRepeatedAttribute() > 3) {
+      if (cell == null || cell.getOdfElement().getTableNumberColumnsRepeatedAttribute() > 3) {
         break;
       }
       try {

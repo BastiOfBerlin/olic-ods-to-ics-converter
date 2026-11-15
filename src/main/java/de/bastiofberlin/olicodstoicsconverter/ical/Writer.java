@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import lombok.experimental.UtilityClass;
 import lombok.extern.java.Log;
@@ -19,7 +20,7 @@ import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.property.Comment;
 import net.fortuna.ical4j.model.property.Description;
-import net.fortuna.ical4j.util.RandomUidGenerator;
+import net.fortuna.ical4j.model.property.Uid;
 import org.jspecify.annotations.NonNull;
 
 @Log
@@ -31,7 +32,8 @@ public class Writer {
   private static final ZoneId ZONE = ZoneId.of(TZ_BERLIN);
   private static final VTimeZone V_TIME_ZONE =
       TimeZoneRegistryFactory.getInstance().createRegistry().getTimeZone(TZ_BERLIN).getVTimeZone();
-  private static final RandomUidGenerator UID_GENERATOR = new RandomUidGenerator();
+  private static final DateTimeFormatter UID_TIME_FORMATTER =
+      DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmm");
 
   public void writeTermineToFile(final Path outputPath, final Collection<Termin> termine)
       throws IOException {
@@ -57,9 +59,15 @@ public class Writer {
     final var meeting =
         new VEvent(start, ende, eventName)
             .withProperty(V_TIME_ZONE.getTimeZoneId())
-            .withProperty(UID_GENERATOR.generateUid())
+            .withProperty(createUid(termin))
             .withProperty(new Description(termin.thema()));
     calendar.withComponent((VEvent) meeting.getFluentTarget());
+  }
+
+  private static @NonNull Uid createUid(final Termin termin) {
+    return new Uid(
+        "%s-%s@olic-ods-to-ics-converter"
+            .formatted(UID_TIME_FORMATTER.format(termin.datum().atTime(termin.start())), termin.art().name()));
   }
 
   private static @NonNull ZonedDateTime getDateTime(final LocalDate date, final LocalTime time) {
