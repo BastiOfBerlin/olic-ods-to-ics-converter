@@ -1,9 +1,9 @@
 [versions]
-guava = "33.5.0-jre"
+guava = "33.8.0-jre"
 picocli = "4.7.7"
 odf = "0.13.0"
-ical4j = "4.2.3"
-lombok = "1.18.42"
+ical4j = "4.4.0"
+lombok = "1.18.48"
 
 [libraries]
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
